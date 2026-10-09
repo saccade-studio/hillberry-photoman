@@ -1,0 +1,17 @@
+{
+  "name": "hillberry-photoman",
+  "version": "1.0.0",
+  "description": "Offline, single-file watermark + crop + export tool for Hillberry Music Festival photographers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node build.mjs && node tools/serve.mjs dist 8765 /hillberry-photoman/",
+    "test": "tests/run-all.sh",
+    "test:unit": "node build.mjs && node tests/unit.mjs",
+    "test:smoke": "node build.mjs && node tests/ci-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

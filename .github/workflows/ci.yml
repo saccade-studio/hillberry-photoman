@@ -1,0 +1,31 @@
+# Checks every push and pull request: the build, the unit tests, and a headless-Chrome smoke test of the built site.
+# This is separate from the deploy workflow on purpose, so a flaky test runner can never block a release.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        run: node build.mjs
+
+      - name: Unit tests
+        run: node tests/unit.mjs
+
+      - name: Browser smoke test (headless Chrome)
+        run: node tests/ci-smoke.mjs

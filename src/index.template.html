@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- The page can never reach the network: no fetches, no remote scripts, images or fonts. Photos stay on this computer, and the browser enforces it. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; worker-src blob:; child-src blob:; connect-src data: blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#16121b">
+<title>Hillberry PhotoMan</title>
+<!--{{HEAD}}-->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a1650'/%3E%3Cpath d='M14 18v28M14 32h14M28 18v28M36 46V18h8a8 8 0 0 1 0 14h-8m8 0a7 7 0 0 1 0 14h-8' fill='none' stroke='%23f58a3d' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/*{{CSS}}*/
+</style>
+</head>
+<body>
+<noscript><div class="noscript"><b>Hillberry PhotoMan needs JavaScript.</b> Please turn it on for this page (or open it in a current version of Chrome, Edge, Firefox or Safari) and reload.</div></noscript>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h12l-3-3M17 17H5l3 3"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-printer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V4h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v6H7z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 11L12 15.5 16.5 11M5 20h14"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 9"/></symbol>
+  </defs>
+</svg>
+
+<div class="app" id="app" data-empty="true">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-plate" id="brandPlate" hidden><img class="brand-logo" id="brandLogo" alt="Hillberry Music Festival 2026"></span>
+      <span class="brand-name">PhotoMan</span>
+      <span class="brand-tag">Watermark · Crop · Export</span>
+    </div>
+    <div class="top-actions">
+      <button class="btn" id="btnAdd" type="button"><svg><use href="#i-plus"/></svg>Add photos</button>
+      <button class="btn ghost" id="btnHelp" type="button" aria-label="Help and quality details" title="How it works"><svg><use href="#i-help"/></svg>Help</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="stage-col" aria-label="Photo preview">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-label="Photo preview with watermarks"></canvas>
+
+        <div class="crop" id="crop" tabindex="0" role="group" hidden
+             aria-label="Crop frame. Arrow keys move it, plus and minus resize it, Shift for bigger steps.">
+          <span class="handle h-nw" data-h="nw"></span><span class="handle h-ne" data-h="ne"></span>
+          <span class="handle h-sw" data-h="sw"></span><span class="handle h-se" data-h="se"></span>
+          <span class="handle h-n" data-h="n"></span><span class="handle h-s" data-h="s"></span>
+          <span class="handle h-e" data-h="e"></span><span class="handle h-w" data-h="w"></span>
+        </div>
+
+        <div class="stage-bar" id="stageBar" hidden>
+          <div class="seg on-stage" id="viewSeg" role="group" aria-label="Preview mode">
+            <button type="button" data-view="frame" aria-pressed="true" title="Show the whole photo with the crop frame">Crop</button>
+            <button type="button" data-view="result" aria-pressed="false" title="Show exactly what will be exported (V)">Result</button>
+          </div>
+          <div class="pill" id="loadingPill" hidden>Loading…</div>
+        </div>
+        <div class="stage-foot" id="stageFoot"></div>
+
+        <div class="stage-empty" id="empty">
+          <div class="dropcard">
+            <div class="logo-plate" id="emptyPlate" hidden><img class="logo" id="emptyLogo" alt="Hillberry Music Festival 2026"></div>
+            <h1>Drop your photos here</h1>
+            <p>Add the festival watermark, crop to a print size, and export at full resolution and quality.</p>
+            <button class="btn primary" id="btnPick" type="button"><svg><use href="#i-plus"/></svg>Choose photos</button>
+            <div class="steps">
+              <div><b><i>1</i>Crop</b>1:1, 4:5, 3:2… or a Scott Print Size</div>
+              <div><b><i>2</i>Watermark</b>Festival logo plus your own</div>
+              <div><b><i>3</i>Export</b>Native resolution, color profile kept</div>
+            </div>
+            <div class="privacy">Works offline. Your photos never leave this computer.</div>
+            <div class="offline-link" id="offlineLinkRow" hidden>Want it without internet? <a href="Hillberry-PhotoMan.html" download="Hillberry-PhotoMan.html">Download PhotoMan as a single file</a>.</div>
+          </div>
+        </div>
+        <div class="dropveil" id="dropveil">Drop to add photos</div>
+      </div>
+
+      <div class="filmstrip" id="filmstrip" role="listbox" aria-label="Photos"></div>
+    </section>
+
+    <aside class="panel" aria-label="Settings">
+      <div class="panel-scroll" id="panelScroll">
+
+        <details class="sec" open id="secCrop">
+          <summary><span class="num">1</span>Crop<svg class="chev"><use href="#i-chev"/></svg></summary>
+          <div class="sec-body">
+            <div class="chips" id="aspectChips" role="group" aria-label="Aspect ratio">
+              <button class="chip" type="button" data-aspect="original" aria-pressed="true">Original</button>
+              <button class="chip" type="button" data-aspect="free" aria-pressed="false">Free</button>
+              <button class="chip" type="button" data-aspect="1:1" aria-pressed="false">1:1</button>
+              <button class="chip" type="button" data-aspect="4:5" aria-pressed="false">4:5</button>
+              <button class="chip" type="button" data-aspect="3:2" aria-pressed="false">3:2</button>
+              <button class="chip" type="button" data-aspect="4:3" aria-pressed="false">4:3</button>
+              <button class="chip" type="button" data-aspect="16:9" aria-pressed="false">16:9</button>
+            </div>
+
+            <div class="scott" id="scottGroup" role="group" aria-label="Scott Print Sizes">
+              <div class="scott-head"><svg><use href="#i-printer"/></svg><b>Scott Print Size</b><span>Printable on site</span></div>
+              <div class="scott-cards">
+                <button class="scott-card" type="button" data-aspect="scott-8x10" aria-pressed="false">
+                  <small>Scott Print Size</small><strong>8 × 10<i>in</i></strong><em>4:5 · prints on site</em>
+                </button>
+                <button class="scott-card" type="button" data-aspect="scott-13x19" aria-pressed="false">
+                  <small>Scott Print Size</small><strong>13 × 19<i>in</i></strong><em>13:19 · prints on site</em>
+                </button>
+              </div>
+            </div>
+
+            <div class="row between">
+              <div class="seg" id="orientSeg" role="group" aria-label="Crop orientation">
+                <button type="button" data-orient="portrait" aria-pressed="false">Portrait</button>
+                <button type="button" data-orient="landscape" aria-pressed="false">Landscape</button>
+              </div>
+              <button class="btn sm" type="button" id="btnRecenter" title="Put the crop back in the middle at the largest size">Re-center</button>
+            </div>
+            <div class="readout" id="cropReadout"></div>
+          </div>
+        </details>
+
+        <details class="sec" open id="secMarks">
+          <summary><span class="num">2</span>Watermarks<svg class="chev"><use href="#i-chev"/></svg></summary>
+          <div class="sec-body">
+            <div class="card" id="cardH">
+              <div class="card-head">
+                <div><div class="where" id="hWhere">Bottom right</div><div class="name" id="hName">Hillberry 2026</div></div>
+                <label class="switch" title="Show or hide this watermark"><input type="checkbox" id="hEnabled" aria-label="Show Hillberry watermark" checked><span></span></label>
+              </div>
+              <div class="mark-row">
+                <div class="logo-preview" id="hPrev"></div>
+                <div class="grow row">
+                  <button class="btn sm" type="button" id="btnHReplace" title="Use a different watermark image in this slot">Replace…</button>
+                  <button class="btn sm ghost" type="button" id="btnHReset" hidden>Use Hillberry logo</button>
+                </div>
+              </div>
+              <label class="slider"><span class="lab">Size</span><output id="hSizeOut"></output><input type="range" id="hSize" min="6" max="60" step="0.5"></label>
+            </div>
+
+            <div class="swap-row"><button class="btn sm ghost" type="button" id="btnSwap" title="Swap left and right"><svg><use href="#i-swap"/></svg>Swap sides</button></div>
+
+            <div class="card off" id="cardC">
+              <div class="card-head">
+                <div><div class="where" id="cWhere">Bottom left</div><div class="name">Your watermark</div></div>
+                <label class="switch" title="Show or hide this watermark"><input type="checkbox" id="cEnabled" aria-label="Show your watermark"><span></span></label>
+              </div>
+              <div class="seg" id="cKindSeg" role="group" aria-label="Watermark type">
+                <button type="button" data-kind="image" aria-pressed="true">Image</button>
+                <button type="button" data-kind="text" aria-pressed="false">Text</button>
+              </div>
+              <div id="cImageBox" class="mark-row">
+                <div class="logo-preview none" id="cPrev">No image</div>
+                <div class="grow row">
+                  <button class="btn sm" type="button" id="btnCPick"><svg><use href="#i-image"/></svg>Choose image…</button>
+                  <button class="btn sm ghost danger" type="button" id="btnCClear" hidden>Remove</button>
+                </div>
+              </div>
+              <p class="hint" id="cImageHint">PNG, WebP or SVG with a transparent background works best.</p>
+              <div id="cTextBox" hidden class="field-group" style="display:grid;gap:10px">
+                <label class="field"><span>Text</span><input class="input" id="cText" type="text" maxlength="60" placeholder="© Your Name Photography" autocomplete="off"></label>
+                <div class="row">
+                  <label class="field" style="flex:1;min-width:120px"><span>Font</span>
+                    <select class="input" id="cFont">
+                      <option value="sans">Sans</option><option value="serif">Serif</option><option value="slab">Slab</option>
+                      <option value="condensed">Condensed</option><option value="script">Script</option><option value="mono">Mono</option>
+                    </select>
+                  </label>
+                  <label class="field"><span>Color</span><input type="color" id="cColor" value="#ffffff"></label>
+                  <label class="check" style="margin-top:18px"><input type="checkbox" id="cBold" checked>Bold</label>
+                </div>
+              </div>
+              <label class="slider"><span class="lab">Size</span><output id="cSizeOut"></output><input type="range" id="cSize" min="6" max="60" step="0.5"></label>
+            </div>
+
+            <label class="slider"><span class="lab">Edge margin <span class="hint">(same on every side)</span></span><output id="marginOut"></output><input type="range" id="margin" min="0.5" max="8" step="0.1"></label>
+            <div class="notice" id="overlapNotice" hidden>The two watermarks overlap at this crop. Lower a size or the margin.</div>
+          </div>
+        </details>
+
+        <details class="sec" open id="secLook">
+          <summary><span class="num">3</span>Look<svg class="chev"><use href="#i-chev"/></svg></summary>
+          <div class="sec-body">
+            <label class="slider"><span class="lab">Opacity</span><output id="opacityOut"></output><input type="range" id="opacity" min="10" max="100" step="1"></label>
+            <div class="row between">
+              <span class="label" style="font-weight:650;color:var(--text)">Drop shadow</span>
+              <label class="switch"><input type="checkbox" id="shadowOn" aria-label="Drop shadow"><span></span></label>
+            </div>
+            <div id="shadowCtl" style="display:grid;gap:10px">
+              <div class="row between">
+                <span class="label">Style</span>
+                <div class="seg" id="shadowStyleSeg" role="group" aria-label="Shadow style">
+                  <button type="button" data-style="dark" aria-pressed="false" title="Dark drop shadow: best on bright photos">Dark shadow</button>
+                  <button type="button" data-style="light" aria-pressed="false" title="Soft light glow: keeps a dark logo readable on night and dusk photos">Light glow</button>
+                </div>
+              </div>
+              <label class="slider"><span class="lab">Strength</span><output id="shStrengthOut"></output><input type="range" id="shStrength" min="0" max="100" step="1"></label>
+              <label class="slider"><span class="lab">Blur</span><output id="shBlurOut"></output><input type="range" id="shBlur" min="0" max="100" step="1"></label>
+              <label class="slider"><span class="lab">Distance</span><output id="shDistanceOut"></output><input type="range" id="shDistance" min="0" max="100" step="1"></label>
+              <label class="slider"><span class="lab">Direction</span><output id="shAngleOut"></output><input type="range" id="shAngle" min="0" max="359" step="1"></label>
+              <div class="row between"><span class="label">Shadow color</span><input type="color" id="shColor" value="#000000" aria-label="Shadow color"></div>
+            </div>
+            <div class="row"><button class="btn sm ghost" type="button" id="btnLookReset">Reset look</button></div>
+          </div>
+        </details>
+
+        <details class="sec" open id="secExport">
+          <summary><span class="num">4</span>Export<svg class="chev"><use href="#i-chev"/></svg></summary>
+          <div class="sec-body">
+            <div class="colorinfo" id="colorInfo"><svg><use href="#i-shield"/></svg><div>Add a photo to see how its color profile is handled.</div></div>
+            <div class="row between">
+              <span class="label">Format</span>
+              <div class="seg" id="fmtSeg" role="group" aria-label="Output format">
+                <button type="button" data-fmt="auto" aria-pressed="true" title="JPEG stays JPEG, PNG stays PNG">Match source</button>
+                <button type="button" data-fmt="jpeg" aria-pressed="false">JPEG</button>
+                <button type="button" data-fmt="png" aria-pressed="false" title="Lossless, larger files">PNG</button>
+              </div>
+            </div>
+            <div id="jpegCtl" style="display:grid;gap:12px">
+              <label class="slider"><span class="lab">JPEG quality</span><output id="qualityOut"></output><input type="range" id="quality" min="80" max="100" step="1"></label>
+              <p class="hint" id="qualityHint" style="margin-top:-6px"></p>
+              <div class="row between">
+                <span class="label">Chroma</span>
+                <div class="seg" id="chromaSeg" role="group" aria-label="Chroma subsampling">
+                  <button type="button" data-chroma="444" aria-pressed="true" title="Full color detail (best)">4:4:4 best</button>
+                  <button type="button" data-chroma="420" aria-pressed="false" title="Smaller files">4:2:0 smaller</button>
+                </div>
+              </div>
+              <label class="check"><input type="checkbox" id="optimize" checked><span>Optimize file size<small>Smaller file, identical pixels. Takes a little longer.</small></span></label>
+            </div>
+            <label class="field"><span>Metadata</span>
+              <select class="input" id="metaSelect">
+                <option value="all">Keep camera info, credits and location</option>
+                <option value="nogps">Keep camera info and credits, remove location</option>
+                <option value="none">Remove all metadata</option>
+              </select>
+            </label>
+            <label class="field"><span>File name ends with</span><input class="input" id="suffix" type="text" maxlength="40" autocomplete="off" spellcheck="false"></label>
+            <label class="check" id="zipRow"><input type="checkbox" id="zipCheck" checked><span>Download several photos as one .zip<small>Avoids a browser prompt for multiple downloads.</small></span></label>
+          </div>
+        </details>
+      </div>
+
+      <div class="panel-foot">
+        <div id="progressWrap" hidden>
+          <div class="progress"><i id="progressFill"></i></div>
+          <div class="progress-label"><span id="progressLabel"></span><span class="row" style="gap:8px;flex-wrap:nowrap"><span id="progressPct"></span><button class="btn sm ghost" type="button" id="btnCancel">Cancel</button></span></div>
+        </div>
+        <button class="btn primary block" id="btnExport" type="button" disabled><svg><use href="#i-download"/></svg><span>Export this photo</span></button>
+        <button class="btn block" id="btnExportAll" type="button" hidden><svg><use href="#i-download"/></svg><span>Export all photos</span></button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<input type="file" id="fileInput" multiple accept="image/*,.heic,.heif,.jpg,.jpeg,.png,.webp,.tif,.tiff" hidden>
+<input type="file" id="markInput" accept="image/*,.svg" hidden>
+<input type="file" id="hInput" accept="image/*,.svg" hidden>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<dialog id="help">
+  <div class="dlg-head"><h2>How PhotoMan keeps your photos intact</h2><button class="btn sm ghost" type="button" id="btnHelpClose" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="dlg-body">
+    <div>
+      <h3>Quality &amp; color</h3>
+      <ul>
+        <li><b>Full resolution.</b> Photos are never resized. Only the crop you choose is removed.</li>
+        <li><b>Maximum JPEG quality</b> with full color detail (4:4:4). PNG export is fully lossless.</li>
+        <li><b>Same color space.</b> The photo's embedded profile (Adobe RGB, Display P3, sRGB…) is read without conversion and written back unchanged. The sRGB watermark is converted into that space so its colors stay exact.</li>
+        <li><b>Camera info and credits are kept.</b> Rotation and size fields are corrected, and embedded previews of the uncropped, un-watermarked original are removed.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Scott Print Sizes</h3>
+      <ul><li>8 × 10 in and 13 × 19 in are the sizes that can be printed on site. The Crop panel shows the print resolution for the area you've chosen.</li></ul>
+    </div>
+    <div>
+      <h3>Shortcuts</h3>
+      <ul>
+        <li><kbd>←</kbd> <kbd>→</kbd> previous / next photo</li>
+        <li><kbd>V</kbd> toggle Crop / Result view</li>
+        <li>Crop frame focused: arrows move, <kbd>+</kbd> <kbd>−</kbd> resize, hold <kbd>Shift</kbd> for bigger steps</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Offline &amp; privacy</h3>
+      <ul><li>This single file works without an internet connection. Nothing is uploaded anywhere.</li></ul>
+    </div>
+    <div>
+      <h3>Browser check</h3>
+      <p style="margin:0 0 8px">Runs a real export on a built-in test image to confirm that this browser handles everything correctly.</p>
+      <button class="btn sm" type="button" id="btnSelfTest">Run browser check</button>
+      <div id="selfTestOut" class="selftest" aria-live="polite"></div>
+    </div>
+    <div>
+      <h3>About this copy</h3>
+      <p style="margin:0 0 4px" id="aboutBuild"></p>
+      <div id="aboutHosted" hidden>
+        <p style="margin:0 0 8px">You're using the online copy. For a copy that works with no internet at all, download the same app as one file and share that file with other photographers.</p>
+        <a class="btn sm" id="aboutDownload" href="Hillberry-PhotoMan.html" download="Hillberry-PhotoMan.html"><svg><use href="#i-download"/></svg>Download offline copy</a>
+      </div>
+      <p style="margin:0" id="aboutOffline" hidden>This is an offline copy: it doesn't update itself. <span id="aboutLatest" hidden>The latest version is always at <a id="aboutLatestLink" href="#" rel="noopener"></a>.</span></p>
+    </div>
+    <div>
+      <h3>Settings</h3>
+      <p style="margin:0 0 8px">Sizes, margin, opacity, shadow and export options are remembered in this browser.</p>
+      <button class="btn sm danger" type="button" id="btnResetAll">Reset all settings</button>
+    </div>
+  </div>
+</dialog>
+
+<script id="hb-core">
+/*{{CORE}}*/
+</script>
+<script id="hb-app">
+/*{{APP}}*/
+</script>
+</body>
+</html>
