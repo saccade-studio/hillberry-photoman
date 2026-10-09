@@ -92,6 +92,7 @@ async function init() {
     const brand = logoThumbURL(assets.hb.logo, 340, 170);
     $('brandLogo').src = brand; $('brandPlate').hidden = false;
     $('emptyLogo').src = brand; $('emptyPlate').hidden = false;
+    syncMarksUI();   // show the logo thumbnail in the watermark card right away, not after the rest of start-up
   }
   await restoreSavedImages();
   await probeAutoOrient();
